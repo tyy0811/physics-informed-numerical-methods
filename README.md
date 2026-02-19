@@ -1,15 +1,15 @@
+
 # Physics-Informed Numerical Methods
 
 A collection of computational physics and machine learning tools for solving partial differential equations (PDEs), combining classical numerical methods with modern physics-informed deep learning approaches.
 
-
 ## Projects
 
-| Project | Method | Equation | Framework |
-|---------|--------|----------|-----------|
-| [FEM Maxwell Solver](#fem-solver-for-2d-magnetostatics) | Finite Element Method | Maxwell (magnetostatic) | scikit-fem |
-| [PINN Stokes Flow](#pinn-for-2d-stokes-flow) | Physics-Informed Neural Network | Stokes | JAX |
-| [Tensor Network](#tensor-network-training-and-svd) | Tensor Train / SVD | — | NumPy |
+| Project                                                 | Method                             | Equation                | Framework     |
+| ------------------------------------------------------- | ---------------------------------- | ----------------------- | ------------- |
+| [FEM Maxwell Solver](#fem-solver-for-2d-magnetostatics) | Finite Element Method              | Maxwell (magnetostatic) | scikit-fem    |
+| [PINN Stokes Flow](#pinn-for-2d-stokes-flow)            | Physics-Informed Neural Network    | Stokes                  | JAX           |
+| [Tensor Networks Notebook](#tensor-networks-notebook)   | TT/MPS, SVD/QR, ED (Lanczos), DMRG | —                       | NumPy / SciPy |
 
 ---
 
@@ -24,9 +24,10 @@ $$\nabla^2 A_z = -\mu_0 J_z$$
 where $A_z$ is the magnetic vector potential and $J_z$ is the current density.
 
 **Features:**
-- Weak form discretization with linear/quadratic elements
-- Dirichlet boundary conditions (A = 0)
-- Magnetic field recovery via $\mathbf{B} = \nabla \times \mathbf{A}$
+
+* Weak form discretization with linear/quadratic elements
+* Dirichlet boundary conditions (A = 0)
+* Magnetic field recovery via $\mathbf{B} = \nabla \times \mathbf{A}$
 
 ```
 fem_maxwell/
@@ -76,9 +77,10 @@ $$\nabla \cdot \mathbf{u} = 0$$
 ```
 
 **Features:**
-- Automatic differentiation for PDE residuals
-- GPU-accelerated training via `jax.jit` and `jax.vmap`
-- Validation against analytical Poiseuille solution
+
+* Automatic differentiation for PDE residuals
+* GPU-accelerated training via `jax.jit` and `jax.vmap`
+* Validation against analytical Poiseuille solution
 
 ```
 pinn_stokes/
@@ -98,21 +100,32 @@ params, history = train(cfg, random.PRNGKey(42))
 
 ---
 
-## Tensor Network Training and SVD
+## Tensor Networks Notebook
 
-Implementation of tensor network methods including Tensor Train decomposition and SVD-based compression.
+A self-contained Jupyter notebook, **`tensor_networks.ipynb`**, with runnable code and notes covering tensor network fundamentals and core algorithms commonly used in computational physics.
 
-**Features:**
-- Tensor Train (TT) decomposition
-- SVD for low-rank approximation
-- Applications to high-dimensional data compression
+**Covers:**
 
-```
-tensor_network/
-├── tensor_train.py      # TT decomposition
-├── svd_compression.py   # SVD utilities
-└── README.md
-```
+* Tensor basics: contraction, reshaping, Frobenius norm
+* Matrix factorizations for tensors:
+
+  * SVD and optimal truncation (Eckart–Young)
+  * QR decomposition and isometries
+* Tensor network structure and gauge:
+
+  * Tree tensor networks (loop-free graphs)
+  * Gauge freedom (inserting $X X^{-1}$ on internal bonds)
+  * Centers of orthogonality (QR “pulling-through”)
+  * Direct orthogonalization (branch density matrices $\rho$ and $\rho^{1/2}$)
+* Canonical forms (MPS/TT ideas, link-centered singular values)
+* **Exact Diagonalization (Lanczos)** using matrix-free $|\psi\rangle \mapsto H|\psi\rangle$
+* **Finite DMRG (open boundaries)** with two-site updates, environments, and SVD truncation
+
+**Typical use cases:**
+
+* High-dimensional compression (TT/MPS)
+* Ground-state search for 1D quantum systems (DMRG)
+* Small-system validation (ED/Lanczos)
 
 ---
 
@@ -128,11 +141,13 @@ pip install -r requirements.txt
 
 **Dependencies:**
 
-| Project | Requirements |
-|---------|--------------|
-| FEM Maxwell | `scikit-fem`, `scipy`, `numpy`, `matplotlib` |
-| PINN Stokes | `jax`, `jaxlib`, `optax`, `matplotlib` |
-| Tensor Network | `numpy`, `scipy` |
+| Project                  | Requirements                                                       |
+| ------------------------ | ------------------------------------------------------------------ |
+| FEM Maxwell              | `scikit-fem`, `scipy`, `numpy`, `matplotlib`                       |
+| PINN Stokes              | `jax`, `jaxlib`, `optax`, `matplotlib`                             |
+| Tensor Networks Notebook | `numpy`, `scipy`, `opt_einsum` (optional), `matplotlib` (optional) |
+
+> To run the notebook: `jupyter lab` or `jupyter notebook`.
 
 ---
 
@@ -142,13 +157,13 @@ pip install -r requirements.txt
 physics-informed-numerical-methods/
 ├── README.md
 ├── requirements.txt
+├── tensor_networks.ipynb
 ├── fem_maxwell/
 │   ├── fem_forward_solver.py
 │   └── README.md
 ├── pinn_stokes/
 │   ├── stokes_channel_pinn.py
 │   └── README.md
-
 ```
 
 ---
@@ -157,22 +172,17 @@ physics-informed-numerical-methods/
 
 ### Classical vs. Data-Driven Approaches
 
-| Aspect | FEM | PINN |
-|--------|-----|------|
-| Discretization | Mesh-based | Mesh-free (collocation points) |
-| Derivatives | Weak form integration | Automatic differentiation |
-| Scalability | Sparse linear systems | GPU-parallelized training |
-| Flexibility | Fixed geometry | Easy geometry changes |
+| Aspect         | FEM                   | PINN                           |
+| -------------- | --------------------- | ------------------------------ |
+| Discretization | Mesh-based            | Mesh-free (collocation points) |
+| Derivatives    | Weak form integration | Automatic differentiation      |
+| Scalability    | Sparse linear systems | GPU-parallelized training      |
+| Flexibility    | Fixed geometry        | Easy geometry changes          |
 
 ### When to Use What
 
-- **FEM**: Well-posed problems, need guaranteed accuracy, complex material properties
-- **PINN**: Inverse problems, surrogate modeling, when mesh generation is difficult
-- **Tensor Networks**: High-dimensional problems, data compression, quantum-inspired ML
+* **FEM**: Well-posed problems, need guaranteed accuracy, complex material properties
+* **PINN**: Inverse problems, surrogate modeling, when mesh generation is difficult
+* **Tensor Networks**: High-dimensional problems, data compression, quantum-inspired ML, 1D quantum ground states (DMRG)
 
 ---
-
-
-
-
-
